@@ -3,16 +3,25 @@ import { useAppContext } from '../context/AppContext'
 import { dummyOrders } from '../assets/assets'
 
 const MyOrders = () => {
-    const [myorders,setMyOrders] = useState([])
-    const {currency} = useAppContext()
+    const [myOrders,setMyOrders ] = useState([])
+    const {currency , axios , user} = useAppContext()
 
     const fetchMyOrders = async () => {
-        setMyOrders(dummyOrders)
+       try {
+        const {data} = await axios.get('/api/order/user')
+        if(data.success){
+            setMyOrders(data.orders)
+        }
+       } catch (error) {
+        console.log(error);
+       }
     }
 
     useEffect(()=>{
-        fetchMyOrders()
-    },[])
+        if(user){
+             fetchMyOrders()
+        }
+     },[user])
 
   return (
     <div className='mt-16 pb-16'>
@@ -20,11 +29,11 @@ const MyOrders = () => {
             <p className='text-2xl font-medium uppercase' >My Orders</p>
             <div className='w-16 h-0.5 bg-primary rounded-full'></div>
         </div>
-        {myorders.map((order,index)=>(
+        {myOrders.map((order,index)=>(
             <div key={index} className='border border-gray-300 rounded-lg mb-10 p-4 py-5 max-w-4xl'>
                 <p className='flex justify-between md:items-center text-gray-400 md:font-medium max-md:flex-col'>
                     <span> OrderId : {order._id} </span>
-                    <span> Payment : {order.PaymentType} </span>
+                    <span> Payment : {order.paymentType} </span>
                     <span> Total Amount : {currency} {order.amount} </span>
                 </p>
                 
